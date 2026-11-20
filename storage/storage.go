@@ -45,6 +45,13 @@ func (store *Store[K, V]) Delete(key K, value V) bool {
 	return true
 }
 
+//convertToOrder выполняет приведение типа (type assertion) из any в enum.Order
+func convertToOrder(value any) enum.Order {
+	return value.(enum.Order)
+}
+
+
+
 // Update атомарно обновляет значение в хранилище по ключу с помощью функции modif.
 func (store *Store[K, V]) Update(key K, modif func(V) V, logger *slog.Logger) (V, bool) {
 	store.mutex.Lock()         // Блокируем доступ на запись и чтение

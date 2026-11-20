@@ -64,7 +64,19 @@ func main(){
 						UpdatedAt: time.Now().UTC(),
 							}
 
-	orderSell := 	enum.Order{
+enum.LogOrderState(orderBuy,logger)
+fmt.Scanln()
+orderBook.Put(uuidOrder1, &orderBuy)
+orderBook.Put(uuidOrder2, &orderSell)
+
+fmt.Scanln()
+
+orderBook.Update(uuidOrder1, modifiers.ModifierForOrder(orderSell.Quantity),logger)
+orderBook.Update(uuidOrder2, modifiers.ModifierForOrder(orderBuy.Quantity),logger)
+
+fmt.Scanln()
+
+orderSell := 	enum.Order{
 						ID: uuidOrder2,
 						TraderID: uuid.NewV4(),
 						Side: enum.SideSell,
