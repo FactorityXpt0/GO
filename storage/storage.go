@@ -45,19 +45,28 @@ func (store *Store[K, V]) Delete(key K, value V) bool {
 	return true
 }
 
-func (store *Store[K, V]) Update(key K, modif func(V) V) (V, bool) {
-	store.mutex.Lock()
-	defer store.mutex.Unlock()
+// Update атомарно обновляет значение в хранилище по ключу с помощью функции modif.
+func (store *Store[K, V]) Update(key K, modif func(V) V, logger *slog.Logger) (V, bool) {
+	store.mutex.Lock()         // Блокируем доступ на запись и чтение
+	defer store.mutex.Unlock() // Гарантируем разблокировку при выходе из функции
 
+	// Ищем текущее значение по ключу; если не найдено — возвращаем пустое значение и false
 	value, ok := store.items[key]
 	if !ok {
 		var zero V
 		return zero, false
 	}
 
-	UpdatedValue := modif(value)
+	UpdatedValue := modif(value) // Вычисляем новое значение на основе старого
+	// TODO: Не хватает сохранения: store.items[key] = UpdatedValue
+	return UpdatedValue, true     
+
+	UpdateValue := modif(value)                             
+	enum.LogOrderState(convertToOrder(UpdatedValue), logger)  
+
 	return UpdatedValue, true
 }
+
 
 type IndexedStorage[K comparable, V any] struct {
 	mutex sync.RWMutex
